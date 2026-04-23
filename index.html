@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>CS Quiz</title>
+<style>
+body { font-family: Arial; text-align: center; background: #f4f4f4; }
+#box { background: white; padding: 20px; margin: auto; width: 300px; }
+button { margin: 5px; padding: 10px; width: 100%; }
+</style>
+</head>
+
+<body>
+
+<div id="box">
+<h2>Computer Science Quiz</h2>
+<p id="timer">Time: 20</p>
+<p id="question">Press Start</p>
+<div id="choices"></div>
+<p id="score"></p>
+<button onclick="startQuiz()">Start</button>
+</div>
+
+<script>
+
+// -------- DATA (LIST) --------
+let questions = [
+{q:"What does CPU stand for?", a:["Central Process Unit","Central Processing Unit","Computer Personal Unit","Control Processing Unit"], c:1},
+{q:"Binary uses which numbers?", a:["0 and 1","1 and 2","2 and 3","0 and 2"], c:0},
+{q:"What does RAM do?", a:["Stores permanent data","Runs programs temporarily","Controls internet","Displays graphics"], c:1},
+{q:"HTML is used to?", a:["Style pages","Structure web pages","Store data","Run programs"], c:1},
+{q:"JavaScript is mainly used for?", a:["Styling","Interactivity","Hardware","Storage"], c:1},
+{q:"What is an algorithm?", a:["A bug","A step-by-step process","A computer","A program error"], c:1},
+{q:"What does URL stand for?", a:["Uniform Resource Locator","Universal Reference Link","User Resource Link","Uniform Read Link"], c:0},
+{q:"What is debugging?", a:["Adding features","Fixing errors","Deleting code","Running code"], c:1},
+{q:"What does input mean?", a:["Output data","User gives data","Deleting data","Saving data"], c:1},
+{q:"What does output mean?", a:["User gives data","Program shows result","Deleting files","Storing memory"], c:1},
+{q:"What is a variable?", a:["A fixed value","A storage for data","A loop","A function"], c:1},
+{q:"What does loop do?", a:["Runs once","Repeats code","Deletes code","Stops program"], c:1},
+{q:"What is an example of hardware?", a:["Keyboard","Google","App","Website"], c:0},
+{q:"What is software?", a:["Physical parts","Programs and apps","Wires","Chips"], c:1},
+{q:"What does Internet do?", a:["Connects computers","Stores RAM","Runs CPU","Deletes files"], c:0}
+];
+
+// -------- VARIABLES --------
+let current = 0;
+let score = 0;
+let time = 20;
+let timer;
+
+// -------- PROCEDURE --------
+function showQuestion(index) {
+    let q = questions[index];
+    document.getElementById("question").innerText = q.q;
+
+    let choicesHTML = "";
+    for (let i = 0; i < q.a.length; i++) {
+        choicesHTML += `<button onclick="checkAnswer(${i})">${q.a[i]}</button>`;
+    }
+    document.getElementById("choices").innerHTML = choicesHTML;
+}
+
+// -------- TIMER --------
+function startTimer() {
+    clearInterval(timer);
+    time = 20;
+    document.getElementById("timer").innerText = "Time: " + time;
+
+    timer = setInterval(function() {
+        time--;
+        document.getElementById("timer").innerText = "Time: " + time;
+
+        if (time == 0) {
+            nextQuestion();
+        }
+    }, 1000);
+}
+
+// -------- CHECK ANSWER --------
+function checkAnswer(choice) {
+    if (choice == questions[current].c) {
+        score++;
+    }
+    nextQuestion();
+}
+
+// -------- NEXT --------
+function nextQuestion() {
+    clearInterval(timer);
+    current++;
+
+    if (current < questions.length) {
+        showQuestion(current);
+        startTimer();
+    } else {
+        endQuiz();
+    }
+}
+
+// -------- START --------
+function startQuiz() {
+    current = 0;
+    score = 0;
+    showQuestion(current);
+    startTimer();
+}
+
+// -------- END --------
+function endQuiz() {
+    document.getElementById("question").innerText = "Done!";
+    document.getElementById("choices").innerHTML = "";
+    document.getElementById("timer").innerText = "";
+    document.getElementById("score").innerText = "Score: " + score + "/15";
+}
+
+</script>
+
+</body>
+</html>
