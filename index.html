@@ -6,6 +6,10 @@
 body { font-family: Arial; text-align: center; background: #f4f4f4; }
 #box { background: white; padding: 20px; margin: auto; width: 320px; }
 button { margin: 5px; padding: 10px; width: 100%; }
+
+.correct { background-color: lightgreen; }
+.wrong { background-color: lightcoral; }
+
 .review { text-align: left; margin-top: 10px; font-size: 14px; }
 </style>
 </head>
@@ -20,7 +24,6 @@ button { margin: 5px; padding: 10px; width: 100%; }
 <p id="question">Press Start</p>
 
 <div id="choices"></div>
-<p id="feedback"></p>
 <p id="score"></p>
 <div id="review"></div>
 
@@ -29,7 +32,7 @@ button { margin: 5px; padding: 10px; width: 100%; }
 
 <script>
 
-// -------- DATA --------
+// -------- LIST --------
 let questions = [
 {q:"What does CPU stand for?", a:["Central Process Unit","Central Processing Unit","Computer Personal Unit","Control Processing Unit"], c:1},
 {q:"Binary uses which numbers?", a:["0 and 1","1 and 2","2 and 3","0 and 2"], c:0},
@@ -55,8 +58,9 @@ let time = 20;
 let timer;
 let userAnswers = [];
 
-// -------- SHOW QUESTION --------
+// -------- PROCEDURE --------
 function showQuestion(index) {
+
     document.getElementById("progress").innerText =
         "Question " + (index + 1) + " / " + questions.length;
 
@@ -64,12 +68,12 @@ function showQuestion(index) {
     document.getElementById("question").innerText = q.q;
 
     let choicesHTML = "";
-    for (let i = 0; i < q.a.length; i++) {
-        choicesHTML += `<button onclick="checkAnswer(${i})">${q.a[i]}</button>`;
+
+    for (let i = 0; i < q.a.length; i++) { // LOOP
+        choicesHTML += `<button id="btn${i}" onclick="checkAnswer(${i})">${q.a[i]}</button>`;
     }
 
     document.getElementById("choices").innerHTML = choicesHTML;
-    document.getElementById("feedback").innerText = "";
 }
 
 // -------- TIMER --------
@@ -95,13 +99,21 @@ function checkAnswer(choice) {
 
     userAnswers.push(choice);
 
-    let feedback = document.getElementById("feedback");
+    let correct = questions[current].c;
 
-    if (choice == questions[current].c) {
+    // highlight answers
+    for (let i = 0; i < 4; i++) {
+        let btn = document.getElementById("btn" + i);
+
+        if (i == correct) {
+            btn.classList.add("correct");
+        } else if (i == choice) {
+            btn.classList.add("wrong");
+        }
+    }
+
+    if (choice == correct) { // SELECTION
         score++;
-        feedback.innerText = "Correct!";
-    } else {
-        feedback.innerText = "Incorrect!";
     }
 
     setTimeout(function() {
@@ -122,12 +134,24 @@ function nextQuestion() {
     }
 }
 
-// -------- START --------
+// -------- START (WITH SHUFFLE BUILT-IN) --------
 function startQuiz() {
+
+    // SHUFFLE ALGORITHM
+    for (let i = questions.length - 1; i > 0; i--) { // ITERATION
+        let j = Math.floor(Math.random() * (i + 1));
+
+        let temp = questions[i];
+        questions[i] = questions[j];
+        questions[j] = temp;
+    }
+
     current = 0;
     score = 0;
     userAnswers = [];
+
     document.getElementById("review").innerHTML = "";
+
     showQuestion(current);
     startTimer();
 }
@@ -138,13 +162,13 @@ function endQuiz() {
     document.getElementById("question").innerText = "Done!";
     document.getElementById("choices").innerHTML = "";
     document.getElementById("timer").innerText = "";
-    document.getElementById("feedback").innerText = "";
+
     document.getElementById("score").innerText =
         "Score: " + score + " / " + questions.length;
 
     let reviewHTML = "<h3>Review:</h3>";
 
-    for (let i = 0; i < questions.length; i++) {
+    for (let i = 0; i < questions.length; i++) { // LOOP
         let q = questions[i];
 
         let userAns = userAnswers[i] !== null
